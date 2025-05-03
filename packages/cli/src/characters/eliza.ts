@@ -34,12 +34,6 @@ export const character: Character = {
   settings: {
     "mcp": {
       "servers": {
-        "github": {
-          "type": "stdio",
-          "name": "Code Server",
-          "command": "npx",
-          "args": ["-y", "@modelcontextprotocol/server-github"]
-        },
         "storyscan-mcp":{
           "type": "stdio",
           "name": "StoryScan",
