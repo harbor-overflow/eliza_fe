@@ -17,6 +17,7 @@ import AgentCreatorRoute from './routes/createAgent';
 import Home from './routes/home';
 import Settings from './routes/settings';
 import EnvSettings from './components/env-settings';
+import { WalletProvider } from './contexts/wallet-context';
 
 // Create a query client with optimized settings
 const queryClient = new QueryClient({
@@ -77,24 +78,26 @@ function App() {
         }}
       >
         <BrowserRouter>
-          <TooltipProvider delayDuration={0}>
-            <SidebarProvider>
-              <AppSidebar />
-              <SidebarInset>
-                <Routes>
-                  <Route path="/" element={<Home />} />
-                  <Route path="chat/:agentId" element={<Chat />} />
-                  <Route path="settings/:agentId" element={<Settings />} />
-                  <Route path="agents/new" element={<AgentCreatorRoute />} />
-                  <Route path="/create" element={<AgentCreator />} />
-                  <Route path="/logs" element={<LogViewer />} />
-                  <Route path="room/:serverId" element={<Room />} />
-                  <Route path="settings/" element={<EnvSettings />} />
-                </Routes>
-              </SidebarInset>
-            </SidebarProvider>
-            <Toaster />
-          </TooltipProvider>
+          <WalletProvider>
+            <TooltipProvider delayDuration={0}>
+              <SidebarProvider>
+                <AppSidebar />
+                <SidebarInset>
+                  <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="chat/:agentId" element={<Chat />} />
+                    <Route path="settings/:agentId" element={<Settings />} />
+                    <Route path="agents/new" element={<AgentCreatorRoute />} />
+                    <Route path="/create" element={<AgentCreator />} />
+                    <Route path="/logs" element={<LogViewer />} />
+                    <Route path="room/:serverId" element={<Room />} />
+                    <Route path="settings/" element={<EnvSettings />} />
+                  </Routes>
+                </SidebarInset>
+              </SidebarProvider>
+              <Toaster />
+            </TooltipProvider>
+          </WalletProvider>
         </BrowserRouter>
       </div>
     </QueryClientProvider>

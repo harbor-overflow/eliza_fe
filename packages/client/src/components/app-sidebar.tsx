@@ -28,6 +28,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
+import WalletConnect from './wallet-connect';
 
 export function AppSidebar() {
   const [onlineAgents, setOnlineAgents] = useState<Agent[]>([]);
@@ -97,6 +98,9 @@ export function AppSidebar() {
           </SidebarMenu>
         </SidebarHeader>
         <SidebarContent>
+          {/* Wallet Connect 컴포넌트 사용 */}
+          <WalletConnect />
+
           {/* Create Button with Dropdown */}
           <div className="px-4 py-2">
             <DropdownMenu>
@@ -300,14 +304,6 @@ export function AppSidebar() {
         </SidebarContent>
         <SidebarFooter className="px-4 py-4">
           <SidebarMenu>
-            <SidebarMenuItem>
-              <NavLink to="https://elizaos.github.io/eliza/docs/intro/" target="_blank">
-                <SidebarMenuButton className="text-muted-foreground rounded-md">
-                  <Book className="size-5" />
-                  <span>Documentation</span>
-                </SidebarMenuButton>
-              </NavLink>
-            </SidebarMenuItem>
             <SidebarMenuItem>
               <NavLink to="/logs">
                 <SidebarMenuButton className="text-muted-foreground rounded-md">
