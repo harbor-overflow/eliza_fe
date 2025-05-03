@@ -687,6 +687,57 @@ export function useUpdateMemory() {
   });
 }
 
+/**
+ * Hook to create a new memory entry for an agent
+ * @returns {UseMutationResult} - Object containing the mutation function and its handlers.
+ */
+export function useCreateMemory() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async ({ agentId, memoryData }: { agentId: UUID; memoryData: Partial<Memory> }) => {
+      const result = await apiClient.createAgentMemory(agentId, memoryData);
+      return { agentId, result };
+    },
+
+    onSuccess: (data) => {
+      // Invalidate relevant queries to trigger refetch
+      queryClient.invalidateQueries({
+        queryKey: ['agents', data.agentId, 'memories'],
+      });
+
+      // Also invalidate room-specific memories if we have roomId in the memory data
+      if (data.result?.roomId) {
+        queryClient.invalidateQueries({
+          queryKey: ['agents', data.agentId, 'rooms', data.result.roomId, 'memories'],
+        });
+      } else {
+        // Otherwise invalidate all room memories for this agent
+        queryClient.invalidateQueries({
+          queryKey: ['agents', data.agentId, 'rooms'],
+          predicate: (query) => query.queryKey.length > 3 && query.queryKey[4] === 'memories',
+        });
+      }
+
+      // Also invalidate regular messages queries
+      if (data.result?.roomId) {
+        queryClient.invalidateQueries({
+          queryKey: ['messages', data.agentId, data.result.roomId],
+        });
+      }
+    },
+
+    onError: (error) => {
+      toast({
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'Failed to create memory',
+        variant: 'destructive',
+      });
+    },
+  });
+}
+
 export function useRooms(options = {}) {
   const network = useNetworkStatus();
 

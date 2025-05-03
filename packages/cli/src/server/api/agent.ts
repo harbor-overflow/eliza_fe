@@ -1396,6 +1396,88 @@ export function agentRouter(
     });
   });
 
+  // create a new memory for an agent
+  router.post('/:agentId/memories', async (req, res) => {
+    const agentId = validateUuid(req.params.agentId);
+
+    if (!agentId) {
+      res.status(400).json({
+        success: false,
+        error: {
+          code: 'INVALID_ID',
+          message: 'Invalid agent ID',
+        },
+      });
+      return;
+    }
+
+    const runtime = agents.get(agentId);
+    if (!runtime) {
+      res.status(404).json({
+        success: false,
+        error: {
+          code: 'NOT_FOUND',
+          message: 'Agent not found',
+        },
+      });
+      return;
+    }
+
+    try {
+      const memoryData = req.body;
+
+      // 필수 필드 확인
+      if (!memoryData.content) {
+        res.status(400).json({
+          success: false,
+          error: {
+            code: 'INVALID_MEMORY',
+            message: 'Memory content is required',
+          },
+        });
+        return;
+      }
+
+      // ID가 없는 경우 생성
+      if (!memoryData.id) {
+        memoryData.id = createUniqueUuid(runtime, `memory-${Date.now()}`);
+      }
+
+      // 에이전트 ID 설정
+      memoryData.agentId = agentId;
+
+      // 타임스탬프 설정
+      if (!memoryData.createdAt) {
+        memoryData.createdAt = Date.now();
+      }
+
+      // 테이블 이름 가져오기 (기본값: messages)
+      const tableName = (req.query.tableName as string) || 'messages';
+
+      // 메모리 생성
+      await runtime.createMemory(memoryData, tableName);
+
+      logger.success(`[MEMORY CREATE] Successfully created memory ${memoryData.id}`);
+      res.status(201).json({
+        success: true,
+        data: {
+          id: memoryData.id,
+          message: 'Memory created successfully',
+        },
+      });
+    } catch (error) {
+      logger.error('[MEMORY CREATE] Error creating memory:', error);
+      res.status(500).json({
+        success: false,
+        error: {
+          code: 'CREATE_ERROR',
+          message: 'Failed to create memory',
+          details: error.message,
+        },
+      });
+    }
+  });
+
   // update a specific memory for an agent
   router.patch('/:agentId/memories/:memoryId', async (req, res) => {
     const agentId = validateUuid(req.params.agentId);

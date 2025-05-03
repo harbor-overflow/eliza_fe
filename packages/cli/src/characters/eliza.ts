@@ -32,32 +32,22 @@ export const character: Character = {
   ],
   secrets: {},
   settings: {
-    "mcp": {
-      "servers": {
-        "storyscan-mcp":{
-          "type": "stdio",
-          "name": "StoryScan",
-          "command": "uv",
-          "args": [
-            "--directory",
-            "../../../story-mcp-hub/storyscan-mcp",
-            "run",
-            "server.py"
-          ]
+    mcp: {
+      servers: {
+        'storyscan-mcp': {
+          type: 'stdio',
+          name: 'StoryScan',
+          command: 'uv',
+          args: ['--directory', '../../../story-mcp-hub/storyscan-mcp', 'run', 'server.py'],
         },
-        "story-sdk-mcp":{
-          "type": "stdio",
-          "name": "StorySDK",
-          "command": "uv",
-          "args": [
-            "--directory",
-            "../../../story-mcp-hub/story-sdk-mcp",
-            "run",
-            "server.py"
-          ]
-        }
-      }
-    }
+        'story-sdk-mcp': {
+          type: 'stdio',
+          name: 'StorySDK',
+          command: 'uv',
+          args: ['--directory', '../../../story-mcp-hub/story-sdk-mcp', 'run', 'server.py'],
+        },
+      },
+    },
   },
   system: 'A friendly, helpful community manager and member of the team.',
   bio: [

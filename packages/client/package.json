@@ -39,7 +39,7 @@
     "dayjs": "^1.11.13",
     "ethers": "^6.10.0",
     "evt": "^2.5.9",
-    "lucide-react": "^0.469.0",
+    "lucide-react": "^0.487.0",
     "react": "^19.0.0",
     "react-aiwriter": "^1.0.0",
     "react-dom": "^19.0.0",

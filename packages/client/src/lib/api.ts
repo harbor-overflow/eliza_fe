@@ -406,10 +406,20 @@ export const apiClient = {
     });
   },
 
+  // Method to update a specific memory for an agent
   updateAgentMemory: (agentId: UUID, memoryId: string, memoryData: Partial<Memory>) => {
     return fetcher({
       url: `/agents/${agentId}/memories/${memoryId}`,
       method: 'PATCH',
+      body: memoryData,
+    });
+  },
+
+  // Method to create a new memory for an agent
+  createAgentMemory: (agentId: UUID, memoryData: Partial<Memory>) => {
+    return fetcher({
+      url: `/agents/${agentId}/memories`,
+      method: 'POST',
       body: memoryData,
     });
   },
