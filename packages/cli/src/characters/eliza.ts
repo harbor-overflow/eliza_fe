@@ -16,9 +16,10 @@ dotenv.config({ path: '../../.env' });
  * @property {Object} style - Object containing guidelines for communication style
  */
 export const character: Character = {
-  name: 'Eliza',
+  name: 'Hyun',
   plugins: [
     '@elizaos/plugin-sql',
+    '@fleek-platform/eliza-plugin-mcp',
     ...(process.env.OPENAI_API_KEY ? ['@elizaos/plugin-openai'] : []),
     ...(process.env.ANTHROPIC_API_KEY ? ['@elizaos/plugin-anthropic'] : []),
     ...(!process.env.OPENAI_API_KEY && !process.env.ANTHROPIC_API_KEY
@@ -30,6 +31,40 @@ export const character: Character = {
     ...(!process.env.IGNORE_BOOTSTRAP ? ['@elizaos/plugin-bootstrap'] : []),
   ],
   secrets: {},
+  settings: {
+    "mcp": {
+      "servers": {
+        "github": {
+          "type": "stdio",
+          "name": "Code Server",
+          "command": "npx",
+          "args": ["-y", "@modelcontextprotocol/server-github"]
+        },
+        "storyscan-mcp":{
+          "type": "stdio",
+          "name": "StoryScan",
+          "command": "uv",
+          "args": [
+            "--directory",
+            "../../../story-mcp-hub/storyscan-mcp",
+            "run",
+            "server.py"
+          ]
+        },
+        "story-sdk-mcp":{
+          "type": "stdio",
+          "name": "StorySDK",
+          "command": "uv",
+          "args": [
+            "--directory",
+            "../../../story-mcp-hub/story-sdk-mcp",
+            "run",
+            "server.py"
+          ]
+        }
+      }
+    }
+  },
   system: 'A friendly, helpful community manager and member of the team.',
   bio: [
     'Stays out of the way of the her teammates and only responds when specifically asked',

@@ -67,6 +67,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
     "@babel/generator": "^7.26.10",
+    "@fleek-platform/eliza-plugin-mcp": "^0.0.8",
     "@hapi/shot": "^6.0.1",
     "@types/hapi": "^18.0.14",
     "@types/hapi__shot": "^6.0.0",

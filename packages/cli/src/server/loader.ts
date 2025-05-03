@@ -72,6 +72,9 @@ export async function jsonToCharacter(character: any): Promise<Character> {
     };
   }
 
+  // 캐릭터 객체에 plugins 속성이 없는 경우 빈 배열로 초기화
+  character.plugins = character.plugins || [];
+
   return character;
 }
 

@@ -35,7 +35,7 @@ dotenv.config({ path: '../../.env' });
  * @property {Object} style - Object containing style guidelines for the character's responses
  */
 export const character: Character = {
-  name: 'Eliza',
+  name: 'Hyun',
   plugins: [
     '@elizaos/plugin-sql',
     '@elizaos/plugin-anthropic',
@@ -45,6 +45,7 @@ export const character: Character = {
     '@elizaos/plugin-pdf',
     '@elizaos/plugin-video-understanding',
     '@elizaos/plugin-bootstrap',
+    '@fleek-platform/eliza-plugin-mcp'
   ],
   settings: {
     secrets: {
