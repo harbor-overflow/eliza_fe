@@ -1,5 +1,5 @@
 {
-  "name": "eliza",
+  "name": "harbor",
   "scripts": {
     "preinstall": "only-allow bun",
     "start": "cd ./packages/the-org && bun run start",
