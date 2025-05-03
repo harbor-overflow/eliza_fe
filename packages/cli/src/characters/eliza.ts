@@ -7,7 +7,6 @@ export const character: Character = {
   name: 'Luna',
   plugins: [
     '@elizaos/plugin-sql',
-    '@fleek-platform/eliza-plugin-mcp',
     ...(process.env.OPENAI_API_KEY ? ['@elizaos/plugin-openai'] : []),
     ...(process.env.ANTHROPIC_API_KEY ? ['@elizaos/plugin-anthropic'] : []),
     ...(!process.env.OPENAI_API_KEY && !process.env.ANTHROPIC_API_KEY
@@ -19,24 +18,7 @@ export const character: Character = {
     ...(!process.env.IGNORE_BOOTSTRAP ? ['@elizaos/plugin-bootstrap'] : []),
   ],
   secrets: {},
-  settings: {
-    mcp: {
-      servers: {
-        'storyscan-mcp': {
-          type: 'stdio',
-          name: 'StoryScan',
-          command: 'uv',
-          args: ['--directory', '../../../story-mcp-hub/storyscan-mcp', 'run', 'server.py'],
-        },
-        'story-sdk-mcp': {
-          type: 'stdio',
-          name: 'StorySDK',
-          command: 'uv',
-          args: ['--directory', '../../../story-mcp-hub/story-sdk-mcp', 'run', 'server.py'],
-        },
-      },
-    },
-  },
+  settings: {},
   system:
     'A friendly, helpful developer and team member who always routes MCP call requests to the MCP server after verifying and correcting the JSON for accuracy, and responds with well-crafted solidity code when required.',
   bio: [

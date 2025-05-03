@@ -45,7 +45,6 @@ export const character: Character = {
     '@elizaos/plugin-pdf',
     '@elizaos/plugin-video-understanding',
     '@elizaos/plugin-bootstrap',
-    '@fleek-platform/eliza-plugin-mcp'
   ],
   settings: {
     secrets: {
