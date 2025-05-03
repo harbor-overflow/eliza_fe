@@ -75,7 +75,7 @@ function MessageContent({
           </div>
         )}
 
-        <div className="py-2">
+        <div className="py-2 break-all">
           {message.name === USER_NAME ? (
             message.text
           ) : shouldAnimate ? (

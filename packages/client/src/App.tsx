@@ -27,8 +27,8 @@ const queryClient = new QueryClient({
       // Default to no polling unless specifically configured
       refetchInterval: false,
       // Make queries retry 3 times with exponential backoff
-      retry: 3,
-      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+      retry: false,
+      // retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
       // Refetch query on window focus
       refetchOnWindowFocus: true,
       // Enable refetch on reconnect
@@ -37,8 +37,8 @@ const queryClient = new QueryClient({
     },
     mutations: {
       // Default to 3 retries for mutations too
-      retry: 3,
-      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+      retry: false,
+      // retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
     },
   },
 });

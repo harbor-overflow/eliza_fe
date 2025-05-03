@@ -39,6 +39,7 @@
     "dayjs": "^1.11.13",
     "ethers": "^6.10.0",
     "evt": "^2.5.9",
+    "js-base64": "^3.7.7",
     "lucide-react": "^0.487.0",
     "react": "^19.0.0",
     "react-aiwriter": "^1.0.0",
