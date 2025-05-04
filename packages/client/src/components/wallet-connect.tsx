@@ -27,6 +27,7 @@ const WalletConnect: React.FC = () => {
     disconnectWallet,
     walletOptions,
     balance,
+    network,
   } = useWallet();
 
   const [isWalletDialogOpen, setIsWalletDialogOpen] = useState(false);
@@ -41,7 +42,7 @@ const WalletConnect: React.FC = () => {
   // 지갑 연결 함수 래퍼
   const handleConnectWallet = async (walletId: string) => {
     await connectWallet(walletId);
-    // connectWallet 함수 내에서 연결 성공 후 상태가 변경되면 위의 useEffect에서 다이얼로그를 닫음
+    // connectWallet 함수 내에서 OAuth 리다이렉션을 수행함
   };
 
   return (
@@ -55,7 +56,7 @@ const WalletConnect: React.FC = () => {
             onClick={() => setIsWalletDialogOpen(true)}
           >
             <Wallet className="mr-2 h-4 w-4" />
-            Connect Wallet
+            Connect SUI Wallet
           </Button>
         ) : (
           <DropdownMenu>
@@ -74,18 +75,21 @@ const WalletConnect: React.FC = () => {
             <DropdownMenuContent align="start" className="w-48">
               {balance && (
                 <div className="px-2 py-1.5 text-sm text-muted-foreground">
-                  {parseFloat(balance).toFixed(4)} ETH
+                  {parseFloat(balance).toFixed(4)} SUI
                 </div>
               )}
+              <div className="px-2 py-1.5 text-xs text-muted-foreground">
+                {network.charAt(0).toUpperCase() + network.slice(1)}
+              </div>
               <DropdownMenuItem
                 onClick={() => navigator.clipboard.writeText(walletAddress || '')}
                 className="cursor-pointer"
               >
-                Copy Address
+                복사 주소
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={disconnectWallet} className="cursor-pointer text-red-500">
-                Disconnect
+                연결 해제
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -96,9 +100,9 @@ const WalletConnect: React.FC = () => {
       <Dialog open={isWalletDialogOpen} onOpenChange={setIsWalletDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Connect Wallet</DialogTitle>
+            <DialogTitle>SUI 지갑 연결</DialogTitle>
             <DialogDescription>
-              Choose a wallet to connect with Ethereum and other blockchains.
+              SUI 블록체인에 연결하려면 아래 소셜 로그인 중 하나를 선택하세요.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
@@ -119,7 +123,7 @@ const WalletConnect: React.FC = () => {
                     />
                   </div>
                   <div className="flex flex-col items-start">
-                    <span className="font-medium">{wallet.name}</span>
+                    <span className="font-medium">{wallet.name} 계정으로 로그인</span>
                     <span className="text-sm text-muted-foreground">{wallet.description}</span>
                     {!wallet.isAvailable && (
                       <span className="text-xs text-orange-500 mt-1">준비 중</span>
@@ -131,7 +135,7 @@ const WalletConnect: React.FC = () => {
           </div>
           <DialogFooter className="flex flex-col sm:flex-row sm:justify-end gap-2">
             <Button variant="outline" onClick={() => setIsWalletDialogOpen(false)}>
-              Cancel
+              취소
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -11,6 +11,7 @@ const CharacterForm = lazy(() => import('../routes/character-form'));
 const CharacterDetail = lazy(() => import('../routes/character-detail'));
 const Settings = lazy(() => import('../routes/settings'));
 const NotFound = lazy(() => import('../routes/not-found'));
+const Callback = lazy(() => import('../components/callback'));
 
 // Loading fallback
 const Loading = () => (
@@ -109,5 +110,13 @@ export const router = createBrowserRouter([
         ),
       },
     ],
+  },
+  {
+    path: '/callback',
+    element: (
+      <Suspense fallback={<Loading />}>
+        <Callback />
+      </Suspense>
+    ),
   },
 ]);
