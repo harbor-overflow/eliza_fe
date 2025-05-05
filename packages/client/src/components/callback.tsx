@@ -9,22 +9,22 @@ const Callback: React.FC = () => {
 
   useEffect(() => {
     const handleCallback = async () => {
-      // URL에서 id_token 파라미터 추출
+      // Extract id_token parameter from URL
       const params = new URLSearchParams(window.location.search);
       const idToken = params.get('id_token');
       
       if (idToken) {
         try {
-          // JWT 처리
+          // Process JWT
           await processJwt(idToken);
           setIsProcessing(false);
         } catch (error) {
-          console.error('JWT 처리 오류:', error);
-          setError('JWT 처리 중 오류가 발생했습니다.');
+          console.error('JWT processing error:', error);
+          setError('An error occurred while processing the authentication token.');
           setIsProcessing(false);
         }
       } else {
-        setError('인증 토큰을 찾을 수 없습니다.');
+        setError('Authentication token not found.');
         setIsProcessing(false);
       }
     };
@@ -36,14 +36,14 @@ const Callback: React.FC = () => {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
-          <strong className="font-bold">오류:</strong>
+          <strong className="font-bold">Error:</strong>
           <span className="block sm:inline"> {error}</span>
         </div>
         <button
           className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
           onClick={() => window.location.href = '/'}
         >
-          홈으로 돌아가기
+          Return to Home
         </button>
       </div>
     );
@@ -53,12 +53,12 @@ const Callback: React.FC = () => {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-700"></div>
-        <p className="mt-4 text-xl font-semibold">인증 처리 중...</p>
+        <p className="mt-4 text-xl font-semibold">Processing authentication...</p>
       </div>
     );
   }
 
-  // 처리가 완료되면 홈페이지로 리다이렉트
+  // Redirect to homepage when complete
   return <Navigate to="/" />;
 };
 

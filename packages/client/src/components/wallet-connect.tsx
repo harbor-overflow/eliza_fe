@@ -32,22 +32,22 @@ const WalletConnect: React.FC = () => {
 
   const [isWalletDialogOpen, setIsWalletDialogOpen] = useState(false);
 
-  // 지갑이 연결되면 다이얼로그를 자동으로 닫음
+  // Automatically close dialog when wallet is connected
   useEffect(() => {
     if (isWalletConnected && isWalletDialogOpen) {
       setIsWalletDialogOpen(false);
     }
   }, [isWalletConnected, isWalletDialogOpen]);
 
-  // 지갑 연결 함수 래퍼
+  // Wallet connection function wrapper
   const handleConnectWallet = async (walletId: string) => {
     await connectWallet(walletId);
-    // connectWallet 함수 내에서 OAuth 리다이렉션을 수행함
+    // The connectWallet function performs OAuth redirection
   };
 
   return (
     <>
-      {/* 지갑 버튼 */}
+      {/* Wallet button */}
       <div className="px-4 py-2">
         {!isWalletConnected ? (
           <Button
@@ -85,24 +85,24 @@ const WalletConnect: React.FC = () => {
                 onClick={() => navigator.clipboard.writeText(walletAddress || '')}
                 className="cursor-pointer"
               >
-                복사 주소
+                Copy Address
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={disconnectWallet} className="cursor-pointer text-red-500">
-                연결 해제
+                Disconnect
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         )}
       </div>
 
-      {/* 지갑 연결 다이얼로그 */}
+      {/* Wallet connection dialog */}
       <Dialog open={isWalletDialogOpen} onOpenChange={setIsWalletDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>SUI 지갑 연결</DialogTitle>
+            <DialogTitle>Connect SUI Wallet</DialogTitle>
             <DialogDescription>
-              SUI 블록체인에 연결하려면 아래 소셜 로그인 중 하나를 선택하세요.
+              Choose a social login option below to connect to the SUI blockchain.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
@@ -123,10 +123,10 @@ const WalletConnect: React.FC = () => {
                     />
                   </div>
                   <div className="flex flex-col items-start">
-                    <span className="font-medium">{wallet.name} 계정으로 로그인</span>
+                    <span className="font-medium">Login with {wallet.name}</span>
                     <span className="text-sm text-muted-foreground">{wallet.description}</span>
                     {!wallet.isAvailable && (
-                      <span className="text-xs text-orange-500 mt-1">준비 중</span>
+                      <span className="text-xs text-orange-500 mt-1">Coming soon</span>
                     )}
                   </div>
                 </div>
@@ -135,7 +135,7 @@ const WalletConnect: React.FC = () => {
           </div>
           <DialogFooter className="flex flex-col sm:flex-row sm:justify-end gap-2">
             <Button variant="outline" onClick={() => setIsWalletDialogOpen(false)}>
-              취소
+              Cancel
             </Button>
           </DialogFooter>
         </DialogContent>

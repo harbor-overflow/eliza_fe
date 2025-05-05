@@ -10,7 +10,7 @@ import {
 } from '@mysten/sui/zklogin';
 import {jwtDecode } from 'jwt-decode';
 
-// JWT 페이로드 타입 정의
+// JWT payload type definition
 interface JwtPayload {
   iss?: string;
   sub?: string; // Subject ID
@@ -21,7 +21,7 @@ interface JwtPayload {
   jti?: string;
 }
 
-// 지갑 옵션 타입 정의
+// Wallet option type definition
 export interface WalletOption {
   id: string;
   name: string;
@@ -30,18 +30,18 @@ export interface WalletOption {
   isAvailable: boolean;
 }
 
-// ZkLogin 상태 인터페이스
+// ZkLogin state interface
 interface ZkLoginState {
   ephemeralKeyPair: Ed25519Keypair | null;
   maxEpoch: number | null;
   randomness: string | null;
   nonce: string | null;
   jwt: string | null;
-  zkProof: any | null; // 실제 zkProof 타입에 맞게 수정 필요
+  zkProof: any | null; // Should be updated with actual zkProof type
   userSalt: string | null;
 }
 
-// 컨텍스트 타입 정의
+// Context type definition
 interface WalletContextType {
   isWalletConnected: boolean;
   walletAddress: string | null;
@@ -56,7 +56,7 @@ interface WalletContextType {
   processJwt: (jwt: string) => Promise<void>;
 }
 
-// 지갑 옵션 목록
+// Wallet options list
 const walletOptions: WalletOption[] = [
   {
     id: 'google',
@@ -70,18 +70,18 @@ const walletOptions: WalletOption[] = [
     name: 'Facebook',
     icon: '/images/wallet/facebook_icon.svg',
     description: 'Login with Facebook account',
-    isAvailable: true,
+    isAvailable: false,
   },
   {
     id: 'kakao',
     name: 'Kakao',
-    icon: '/images/wallet/kakao_icon.svg',
+    icon: '/images/wallet/kakao_icon.png',
     description: 'Login with Kakao account',
     isAvailable: true,
   },
 ];
 
-// 기본 zkLogin 상태
+// Default zkLogin state
 const defaultZkLoginState: ZkLoginState = {
   ephemeralKeyPair: null,
   maxEpoch: null,
@@ -92,7 +92,7 @@ const defaultZkLoginState: ZkLoginState = {
   userSalt: null,
 };
 
-// 기본값 생성
+// Default context value
 const defaultContextValue: WalletContextType = {
   isWalletConnected: false,
   walletAddress: null,
@@ -103,14 +103,14 @@ const defaultContextValue: WalletContextType = {
   disconnectWallet: () => {},
   walletOptions,
   zkLoginState: defaultZkLoginState,
-  network: 'devnet', // 기본값은 devnet
-  processJwt: async () => {}, // processJwt 기본값 추가
+  network: 'devnet', // Default is devnet
+  processJwt: async () => {}, // Default processJwt function
 };
 
-// Context 생성
+// Create context
 const WalletContext = createContext<WalletContextType>(defaultContextValue);
 
-// 컨텍스트 훅
+// Context hook
 export const useWallet = () => useContext(WalletContext);
 
 interface WalletProviderProps {
@@ -129,26 +129,26 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({
   const [balance, setBalance] = useState<string | null>(null);
   const [zkLoginState, setZkLoginState] = useState<ZkLoginState>(defaultZkLoginState);
 
-  // SUI 클라이언트 초기화
+  // Initialize SUI client
   useEffect(() => {
     const client = new SuiClient({ url: getFullnodeUrl(network) });
     setSuiClient(client);
   }, [network]);
 
-  // 로컬 스토리지에서 이전 인증 정보 확인
+  // Check for previous authentication in session storage
   useEffect(() => {
     const checkConnection = async () => {
       if (!suiClient) return;
 
       try {
-        // 세션 스토리지에서 인증 정보 가져오기
+        // Get authentication info from session storage
         const savedState = sessionStorage.getItem('zkLoginState');
         const savedAddress = sessionStorage.getItem('walletAddress');
 
         if (savedState && savedAddress) {
           const parsedState = JSON.parse(savedState);
           
-          // 저장된 ephemeralKeyPair 재생성
+          // Recreate stored ephemeralKeyPair
           let ephemeralKeyPair = null;
           if (parsedState.ephemeralPrivateKey) {
             const privateKeyBytes = new Uint8Array(
@@ -157,7 +157,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({
             ephemeralKeyPair = Ed25519Keypair.fromSecretKey(privateKeyBytes);
           }
 
-          // zkLoginState 복원
+          // Restore zkLoginState
           setZkLoginState({
             ...parsedState,
             ephemeralKeyPair
@@ -166,18 +166,18 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({
           setWalletAddress(savedAddress);
           setIsWalletConnected(true);
 
-          // 잔액 조회
+          // Get balance
           try {
             const { totalBalance } = await suiClient.getBalance({
               owner: savedAddress
             });
             setBalance(totalBalance);
           } catch (error) {
-            console.error('잔액 조회 실패:', error);
+            console.error('Failed to get balance:', error);
           }
         }
       } catch (error) {
-        console.error('자동 지갑 연결 실패:', error);
+        console.error('Automatic wallet connection failed:', error);
       }
     };
 
@@ -186,23 +186,23 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({
     }
   }, [suiClient]);
 
-  // zkLogin 프로세스 시작 함수
+  // Start zkLogin process
   const startZkLogin = async (provider: string) => {
     if (!suiClient) return;
 
     try {
-      // 1. 임시 키 페어 생성
+      // 1. Generate ephemeral key pair
       const ephemeralKeyPair = new Ed25519Keypair();
       
-      // 2. 현재 epoch 정보 가져오기
+      // 2. Get current epoch info
       const { epoch, epochDurationMs } = await suiClient.getLatestSuiSystemState();
-      const maxEpoch = Number(epoch) + 2; // 2 epoch 동안 유효
+      const maxEpoch = Number(epoch) + 2; // Valid for 2 epochs
       
-      // 3. nonce 생성
+      // 3. Generate nonce
       const randomness = generateRandomness();
       const nonce = generateNonce(ephemeralKeyPair.getPublicKey(), maxEpoch, randomness);
       
-      // 4. zkLoginState 업데이트
+      // 4. Update zkLoginState
       setZkLoginState({
         ephemeralKeyPair,
         maxEpoch,
@@ -213,30 +213,29 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({
         userSalt: null
       });
       
-      // 5. 적절한 OAuth URL 구성
+      // 5. Configure OAuth URL
       let authUrl = '';
-      let clientId = ''; // 실제 클라이언트 ID로 대체 필요
-      const redirectUrl = window.location.origin + '/callback'; // 리다이렉션 URL 설정
+      let clientId = ''; // Should be replaced with actual client ID
+      const redirectUrl = window.location.origin + '/callback'; // Set redirect URL
 
-      alert(import.meta.env.VITE_GOOGLE_CLIENT_ID)
       switch (provider) {
         case 'google':
-          clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || ''; // Google 클라이언트 ID
+          clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || ''; // Google client ID
           authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&response_type=id_token&redirect_uri=${redirectUrl}&scope=openid&nonce=${nonce}`;
           break;
         case 'facebook':
-          clientId = ''; // Facebook 클라이언트 ID
+          clientId = import.meta.env.VITE_FACEBOOK_CLIENT_ID || ''; // Facebook client ID
           authUrl = `https://www.facebook.com/v17.0/dialog/oauth?client_id=${clientId}&redirect_uri=${redirectUrl}&scope=openid&nonce=${nonce}&response_type=id_token`;
           break;
         case 'kakao':
-          clientId = ''; // Kakao 클라이언트 ID
+          clientId = import.meta.env.VITE_KAKAO_CLIENT_ID || ''; // Kakao client ID
           authUrl = `https://kauth.kakao.com/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUrl}&response_type=code&scope=openid&nonce=${nonce}`;
           break;
         default:
-          throw new Error(`${provider} 제공자는 지원되지 않습니다.`);
+          throw new Error(`Provider ${provider} is not supported.`);
       }
       
-      // 6. 임시 키 페어 정보를 세션 스토리지에 저장
+      // 6. Store ephemeral key pair info in session storage
       const ephemeralPrivateKey = Array.from(ephemeralKeyPair.getSecretKey());
       sessionStorage.setItem('zkLoginState', JSON.stringify({
         ephemeralPrivateKey,
@@ -246,38 +245,38 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({
         provider
       }));
       
-      // 7. OAuth 로그인 페이지로 이동
+      // 7. Redirect to OAuth login page
       window.location.href = authUrl;
       
     } catch (error) {
-      console.error('zkLogin 시작 오류:', error);
+      console.error('zkLogin start error:', error);
       setIsConnecting(false);
     }
   };
 
-  // 리다이렉트 후 JWT 처리 함수
+  // Process JWT after redirect
   const processJwt = async (jwt: string) => {
     if (!suiClient || !zkLoginState.ephemeralKeyPair || !zkLoginState.nonce) {
-      console.error('필요한 zkLogin 상태가 없습니다.');
+      console.error('Required zkLogin state is missing.');
       return;
     }
 
     try {
-      // 1. JWT 디코드
+      // 1. Decode JWT
       const decodedJwt = jwtDecode(jwt) as JwtPayload;
       
-      // 2. userSalt 얻기 (실제 구현에서는 개발자 백엔드 API를 호출해야 함)
-      // 여기서는 예시로 단순한 값을 사용
-      const userSalt = '1000000'; // 실제 구현에서는 백엔드에서 가져와야 함
+      // 2. Get userSalt (in real implementation, should call backend API)
+      // Using simple value for example
+      const userSalt = '1000000'; // In real implementation, should be fetched from backend
       
-      // 3. 주소 계산
+      // 3. Calculate address
       const address = jwtToAddress(jwt, userSalt);
       
-      // 4. ZK 증명 가져오기 (실제 구현에서는 ZK 증명 서비스 호출)
-      // 여기서는 가짜 데이터를 사용
-      const zkProof = { /* 실제 ZK 증명 데이터 */ };
+      // 4. Get ZK proof (in real implementation, should call ZK proving service)
+      // Using dummy data here
+      const zkProof = { /* Actual ZK proof data */ };
       
-      // 5. 상태 업데이트
+      // 5. Update state
       setZkLoginState(prevState => ({
         ...prevState,
         jwt,
@@ -288,7 +287,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({
       setWalletAddress(address);
       setIsWalletConnected(true);
       
-      // 6. 세션 스토리지 업데이트
+      // 6. Update session storage
       sessionStorage.setItem('walletAddress', address);
       const currentState = JSON.parse(sessionStorage.getItem('zkLoginState') || '{}');
       sessionStorage.setItem('zkLoginState', JSON.stringify({
@@ -298,48 +297,48 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({
         zkProof
       }));
       
-      // 7. 잔액 조회
+      // 7. Get balance
       try {
         const { totalBalance } = await suiClient.getBalance({
           owner: address
         });
         setBalance(totalBalance);
       } catch (error) {
-        console.error('잔액 조회 실패:', error);
+        console.error('Failed to get balance:', error);
       }
       
     } catch (error) {
-      console.error('JWT 처리 오류:', error);
+      console.error('JWT processing error:', error);
     } finally {
       setIsConnecting(false);
     }
   };
 
-  // 지갑 연결 함수
+  // Connect wallet function
   const connectWallet = async (walletId: string) => {
     setIsConnecting(true);
 
     try {
       await startZkLogin(walletId);
     } catch (error) {
-      console.error('지갑 연결 중 오류 발생:', error);
+      console.error('Error connecting wallet:', error);
       setIsConnecting(false);
     }
   };
 
-  // 지갑 연결 해제 함수
+  // Disconnect wallet function
   const disconnectWallet = () => {
     setWalletAddress(null);
     setIsWalletConnected(false);
     setBalance(null);
     setZkLoginState(defaultZkLoginState);
     
-    // 세션 스토리지에서 데이터 삭제
+    // Remove data from session storage
     sessionStorage.removeItem('zkLoginState');
     sessionStorage.removeItem('walletAddress');
   };
 
-  // 컨텍스트 값
+  // Context value
   const value = {
     isWalletConnected,
     walletAddress,
