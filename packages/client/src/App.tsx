@@ -17,8 +17,8 @@ import AgentCreatorRoute from './routes/createAgent';
 import Home from './routes/home';
 import Settings from './routes/settings';
 import EnvSettings from './components/env-settings';
+import { WalletProvider } from './contexts/wallet-context';
 import { AuthCallback } from './components/auth-callback';
-import { SuiWalletProvider } from './components/wallet-provider';
 
 // Create a query client with optimized settings
 const queryClient = new QueryClient({
@@ -77,9 +77,9 @@ function App() {
         style={{
           colorScheme: 'dark',
         }}
-      >  
+      >
         <BrowserRouter>
-          <SuiWalletProvider>
+          <WalletProvider>
             <TooltipProvider delayDuration={0}>
               <SidebarProvider>
                 <AppSidebar />
@@ -99,7 +99,7 @@ function App() {
               </SidebarProvider>
               <Toaster />
             </TooltipProvider>
-          </SuiWalletProvider>
+          </WalletProvider>
         </BrowserRouter>
       </div>
     </QueryClientProvider>
