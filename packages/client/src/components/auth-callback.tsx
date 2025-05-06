@@ -8,7 +8,6 @@ export const AuthCallback: React.FC = () => {
   useEffect(() => {
     const handleCallback = async () => {
       try {
-        // 현재 URL에서 콜백 처리
         const result = await handleAuthCallback(window.location.href);
         
         // 인증 성공 시 메인 페이지로 이동
