@@ -18,6 +18,59 @@ import {
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
 
+import { ConnectButton, useCurrentAccount, useSuiClientQuery } from '@mysten/dapp-kit';
+import '@mysten/dapp-kit/dist/index.css';
+
+const WalletConnectContent = () => {
+  const account = useCurrentAccount();
+
+  return (
+    <div className="flex flex-col gap-4">
+      <ConnectButton />
+      
+      {account && (
+        <div className="flex flex-col gap-2">
+          <div>Connected to: {account.address}</div>
+          <OwnedObjects address={account.address} />
+        </div>
+      )}
+    </div>
+  );
+};
+
+const OwnedObjects = ({ address }: { address: string }) => {
+  const { data } = useSuiClientQuery('getOwnedObjects', {
+    owner: address,
+  });
+
+  if (!data) {
+    return <div>Loading objects...</div>;
+  }
+
+  return (
+    <div className="mt-4">
+      <h3 className="text-lg font-semibold mb-2">Owned Objects</h3>
+      <ul className="list-disc list-inside">
+        {data.data.map((object) => {
+          if (!object.data?.objectId) return null;
+          return (
+            <li key={object.data.objectId}>
+              <a 
+                href={`https://explorer.sui.io/object/${object.data.objectId}?network=devnet`} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:underline"
+              >
+                {object.data.objectId}
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+};
+
 const WalletConnect: React.FC = () => {
   const {
     isWalletConnected,
@@ -145,3 +198,4 @@ const WalletConnect: React.FC = () => {
 };
 
 export default WalletConnect;
+export { WalletConnectContent };
