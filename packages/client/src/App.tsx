@@ -18,7 +18,7 @@ import Home from './routes/home';
 import Settings from './routes/settings';
 import EnvSettings from './components/env-settings';
 import { CustomWalletProvider } from './contexts/wallet-context';
-import { AuthCallback } from './components/auth-callback';
+import Callback from './components/callback';
 import { SuiClientProvider, WalletProvider } from '@mysten/dapp-kit';
 import { getFullnodeUrl } from '@mysten/sui/client';
 
@@ -103,7 +103,7 @@ function App() {
                     <Route path="/logs" element={<LogViewer />} />
                     <Route path="room/:serverId" element={<Room />} />
                     <Route path="settings/" element={<EnvSettings />} />
-                    <Route path="/callback" element={<AuthCallback />} />
+                    <Route path="/callback" element={<Callback />} />
                   </Routes>
                 </SidebarInset>
               </SidebarProvider>

@@ -9,6 +9,7 @@ import {
   jwtToAddress
 } from '@mysten/sui/zklogin';
 import {jwtDecode } from 'jwt-decode';
+import { getZkProof } from '@/lib/auth';
 
 // JWT payload type definition
 interface JwtPayload {
@@ -32,7 +33,7 @@ export interface WalletOption {
 
 // ZkLogin state interface
 interface ZkLoginState {
-  ephemeralKeyPair: Ed25519Keypair | null;
+  ephemeralPrivateKey: string | null;
   maxEpoch: number | null;
   randomness: string | null;
   nonce: string | null;
@@ -83,7 +84,7 @@ const walletOptions: WalletOption[] = [
 
 // Default zkLogin state
 const defaultZkLoginState: ZkLoginState = {
-  ephemeralKeyPair: null,
+  ephemeralPrivateKey: null,
   maxEpoch: null,
   randomness: null,
   nonce: null,
@@ -201,10 +202,12 @@ export const CustomWalletProvider: React.FC<WalletProviderProps> = ({
       // 3. Generate nonce
       const randomness = generateRandomness();
       const nonce = generateNonce(ephemeralKeyPair.getPublicKey(), maxEpoch, randomness);
-      
+        
+      const ephemeralPrivateKey = ephemeralKeyPair.getSecretKey();
+
       // 4. Update zkLoginState
       setZkLoginState({
-        ephemeralKeyPair,
+        ephemeralPrivateKey,
         maxEpoch,
         randomness,
         nonce,
@@ -236,7 +239,7 @@ export const CustomWalletProvider: React.FC<WalletProviderProps> = ({
       }
       
       // 6. Store ephemeral key pair info in session storage
-      const ephemeralPrivateKey = Array.from(ephemeralKeyPair.getSecretKey());
+      
       sessionStorage.setItem('zkLoginState', JSON.stringify({
         ephemeralPrivateKey,
         maxEpoch,
@@ -256,8 +259,14 @@ export const CustomWalletProvider: React.FC<WalletProviderProps> = ({
 
   // Process JWT after redirect
   const processJwt = async (jwt: string) => {
-    if (!suiClient || !zkLoginState.ephemeralKeyPair || !zkLoginState.nonce) {
-      console.error('Required zkLogin state is missing.');
+    const savedState = sessionStorage.getItem('zkLoginState');
+    if (savedState) {
+      console.log('Saved state:', savedState);
+      setZkLoginState(JSON.parse(savedState));
+    }
+
+    if (!suiClient || !zkLoginState.ephemeralPrivateKey || !zkLoginState.nonce) {
+      console.error('Required zkLogin state is missing.', suiClient, zkLoginState.ephemeralPrivateKey, zkLoginState.nonce);
       return;
     }
 
@@ -272,14 +281,17 @@ export const CustomWalletProvider: React.FC<WalletProviderProps> = ({
       // 3. Calculate address
       const address = jwtToAddress(jwt, userSalt);
       
+      const ephemeralKeyPair = Ed25519Keypair.fromSecretKey(zkLoginState.ephemeralPrivateKey);
+
+      const maxEpoch = zkLoginState.maxEpoch || "";
+
       // 4. Get ZK proof (in real implementation, should call ZK proving service)
-      // Using dummy data here
-      const zkProof = { /* Actual ZK proof data */ };
+      const zkProof = await getZkProof(jwt, ephemeralKeyPair, maxEpoch.toString(), zkLoginState.randomness || "", userSalt);
       
       // 5. Update state
       setZkLoginState(prevState => ({
         ...prevState,
-        jwt,
+        decodedJwt,
         userSalt,
         zkProof
       }));
@@ -292,7 +304,7 @@ export const CustomWalletProvider: React.FC<WalletProviderProps> = ({
       const currentState = JSON.parse(sessionStorage.getItem('zkLoginState') || '{}');
       sessionStorage.setItem('zkLoginState', JSON.stringify({
         ...currentState,
-        jwt,
+        decodedJwt,
         userSalt,
         zkProof
       }));
