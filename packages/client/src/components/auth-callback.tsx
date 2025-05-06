@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { handleAuthCallback } from '../lib/auth';
 
 export const AuthCallback: React.FC = () => {
   const navigate = useNavigate();
@@ -8,7 +7,7 @@ export const AuthCallback: React.FC = () => {
   useEffect(() => {
     const handleCallback = async () => {
       try {
-        const result = await handleAuthCallback(window.location.href);
+        // const result = await handleAuthCallback(window.location.href);
         
         // 인증 성공 시 메인 페이지로 이동
         navigate('/');
