@@ -9,7 +9,7 @@ export const AuthCallback: React.FC = () => {
     const handleCallback = async () => {
       try {
         const result = await handleAuthCallback(window.location.href);
-        console.log('Auth callback result:', result);
+        
         // 인증 성공 시 메인 페이지로 이동
         navigate('/');
       } catch (error) {
