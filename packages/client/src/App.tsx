@@ -18,6 +18,7 @@ import Home from './routes/home';
 import Settings from './routes/settings';
 import EnvSettings from './components/env-settings';
 import { WalletProvider } from './contexts/wallet-context';
+import { AuthCallback } from './components/auth-callback';
 
 // Create a query client with optimized settings
 const queryClient = new QueryClient({
@@ -92,6 +93,7 @@ function App() {
                     <Route path="/logs" element={<LogViewer />} />
                     <Route path="room/:serverId" element={<Room />} />
                     <Route path="settings/" element={<EnvSettings />} />
+                    <Route path="/callback" element={<AuthCallback />} />
                   </Routes>
                 </SidebarInset>
               </SidebarProvider>

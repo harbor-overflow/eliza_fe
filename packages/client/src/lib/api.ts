@@ -508,4 +508,32 @@ export const apiClient = {
       },
     });
   },
+
+  getZkProof: (jwt: string, userSalt: string) => {
+    return fetcher({
+      url: `/zk-proof`,
+      method: 'POST',
+      body: {
+        jwt,
+        userSalt,
+      },
+    });
+  },
+
+  verifyJwt: (jwt: string) => {
+    return fetcher({
+      url: `/verify-jwt`,
+      method: 'POST',
+      body: {
+        jwt,
+      },
+    });
+  },
+
+  getUserSalt: () => {
+    return fetcher({
+      url: `/user-salt`,
+      method: 'GET',
+    });
+  },
 };
