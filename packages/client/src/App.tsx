@@ -17,8 +17,16 @@ import AgentCreatorRoute from './routes/createAgent';
 import Home from './routes/home';
 import Settings from './routes/settings';
 import EnvSettings from './components/env-settings';
-import { WalletProvider } from './contexts/wallet-context';
+import { CustomWalletProvider } from './contexts/wallet-context';
 import { AuthCallback } from './components/auth-callback';
+import { SuiClientProvider, WalletProvider } from '@mysten/dapp-kit';
+import { getFullnodeUrl } from '@mysten/sui/client';
+
+const networks = {
+  devnet: { url: getFullnodeUrl('devnet') },
+  mainnet: { url: getFullnodeUrl('mainnet') },
+  testnet: { url: getFullnodeUrl('testnet') },
+};
 
 // Create a query client with optimized settings
 const queryClient = new QueryClient({
@@ -79,11 +87,13 @@ function App() {
         }}
       >
         <BrowserRouter>
-          <WalletProvider>
-            <TooltipProvider delayDuration={0}>
-              <SidebarProvider>
-                <AppSidebar />
-                <SidebarInset>
+          <SuiClientProvider networks={networks} defaultNetwork="testnet">
+            <WalletProvider>
+              <CustomWalletProvider>
+                <TooltipProvider delayDuration={0}>
+                  <SidebarProvider>
+                    <AppSidebar />
+                  <SidebarInset>
                   <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="chat/:agentId" element={<Chat />} />
@@ -98,9 +108,11 @@ function App() {
                 </SidebarInset>
               </SidebarProvider>
               <Toaster />
-            </TooltipProvider>
+              </TooltipProvider>
+            </CustomWalletProvider>
           </WalletProvider>
-        </BrowserRouter>
+        </SuiClientProvider>
+      </BrowserRouter>
       </div>
     </QueryClientProvider>
   );

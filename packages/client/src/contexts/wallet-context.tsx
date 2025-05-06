@@ -118,7 +118,7 @@ interface WalletProviderProps {
   network?: 'mainnet' | 'testnet' | 'devnet';
 }
 
-export const WalletProvider: React.FC<WalletProviderProps> = ({ 
+export const CustomWalletProvider: React.FC<WalletProviderProps> = ({ 
   children, 
   network = 'devnet' 
 }) => {
