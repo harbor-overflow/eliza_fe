@@ -552,58 +552,6 @@ export function createApiRouter(
     res.json({ message: 'Server stopping...' });
   });
 
-  // JWT verification endpoint
-  router.post('/verify-jwt', (req, res) => {
-    const { jwt } = req.body;
-
-    if (!jwt) {
-      return res.status(400).json({ error: 'JWT token is required' });
-    }
-
-    try {
-      // TODO: Implement JWT verification logic
-      // This should verify the JWT token and return the decoded payload
-      // For now, we'll just return a success response
-      return res.json({ success: true, verified: true });
-    } catch (error) {
-      return res.status(401).json({ error: 'Invalid JWT token' });
-    }
-  });
-
-  // JWT user salt endpoint
-  router.get('/user-salt', (req, res) => {
-    try {
-      // TODO: Implement user salt generation logic
-      // This should generate or retrieve a unique salt for the user
-      const salt = crypto.randomBytes(32).toString('hex');
-      return res.json({ success: true, salt });
-    } catch (error) {
-      return res.status(500).json({ error: 'Failed to generate user salt' });
-    }
-  });
-
-  // JWT ZK proof endpoint
-  router.post('/zk-proof', (req, res) => {
-    const { jwt, userSalt } = req.body;
-
-    if (!jwt || !userSalt) {
-      return res.status(400).json({ error: 'JWT token and userSalt are required' });
-    }
-
-    try {
-      // TODO: Implement ZK proof generation logic
-      // This should generate a zero-knowledge proof based on the JWT and user salt
-      const proof = {
-        verified: true,
-        timestamp: Date.now(),
-        // Add any other necessary proof data
-      };
-      return res.json({ success: true, proof });
-    } catch (error) {
-      return res.status(500).json({ error: 'Failed to generate ZK proof' });
-    }
-  });
-
   // Logs endpoint
   const logsHandler = (req, res) => {
     const since = req.query.since ? Number(req.query.since) : Date.now() - 3600000; // Default 1 hour
