@@ -20,15 +20,7 @@ import { useEffect, useState } from 'react';
 import { NavLink, useLocation } from 'react-router';
 import AgentAvatarStack from './agent-avatar-stack';
 import ConnectionStatus from './connection-status';
-import GroupPanel from './group-panel';
-import { Button } from './ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from './ui/dropdown-menu';
-import WalletConnect from './wallet-connect';
+import { ConnectButton, useCurrentAccount  } from '@mysten/dapp-kit';
 
 export function AppSidebar() {
   const [onlineAgents, setOnlineAgents] = useState<Agent[]>([]);
@@ -51,8 +43,6 @@ export function AppSidebar() {
       agentAvatars[agent.id] = agent.settings.avatar;
     }
   }
-
-  const [isGroupPanelOpen, setIsGroupPanelOpen] = useState(false);
 
   useEffect(() => {
     // Split into online and offline agents
@@ -78,6 +68,8 @@ export function AppSidebar() {
     setOfflineAgents(offlineAgents);
   }, [isRoomPage, agentsData, roomId, roomsData]);
 
+  const currentAccount = useCurrentAccount();
+
   return (
     <>
       <Sidebar className="bg-background">
@@ -98,45 +90,20 @@ export function AppSidebar() {
           </SidebarMenu>
         </SidebarHeader>
         <SidebarContent>
-          {/* Wallet Connect 컴포넌트 사용 */}
-          <WalletConnect />
-
-          {/* Create Button with Dropdown */}
-          <div className="px-4 py-2">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="default" className="w-full justify-start">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Create
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-48">
-                <DropdownMenuItem asChild>
-                  <NavLink to="/create" className="flex items-center cursor-pointer">
-                    <span>Create Agent</span>
-                  </NavLink>
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  asChild
-                  onClick={() => {
-                    setIsGroupPanelOpen(true);
-                  }}
-                  className="flex items-center cursor-pointer"
-                >
-                  <span>Create Room</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-
-          {isGroupPanelOpen && (
-            <GroupPanel
-              agents={agents}
-              onClose={() => {
-                setIsGroupPanelOpen(false);
-              }}
-            />
-          )}
+          {/* Wallet Section */}
+          <SidebarGroup>
+            <SidebarGroupContent className="px-2">
+              <div className="px-4 py-2">
+                {
+                  currentAccount ? (
+                    <p>Connected Account: {currentAccount.address}</p>
+                  ) : (
+                    <ConnectButton />
+                  )
+                }
+              </div>
+            </SidebarGroupContent>
+          </SidebarGroup>
 
           {/* Agents Section */}
           <SidebarGroup>

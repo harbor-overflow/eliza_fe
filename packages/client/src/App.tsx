@@ -17,8 +17,8 @@ import AgentCreatorRoute from './routes/createAgent';
 import Home from './routes/home';
 import Settings from './routes/settings';
 import EnvSettings from './components/env-settings';
-import { AuthCallback } from './components/auth-callback';
-import { SuiWalletProvider } from './components/wallet-provider';
+import { SuiClientProvider, WalletProvider } from '@mysten/dapp-kit';
+import { getFullnodeUrl } from '@mysten/sui/client';
 
 // Create a query client with optimized settings
 const queryClient = new QueryClient({
@@ -62,6 +62,13 @@ const prefetchInitialData = async () => {
 // Execute prefetch immediately
 prefetchInitialData();
 
+// 네트워크 설정
+const networks = {
+  devnet: { url: getFullnodeUrl('devnet') },
+  mainnet: { url: getFullnodeUrl('mainnet') },
+  testnet: { url: getFullnodeUrl('testnet') },
+};
+
 function App() {
   useVersion();
 
@@ -72,36 +79,37 @@ function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <div
-        className="dark antialiased"
-        style={{
-          colorScheme: 'dark',
-        }}
-      >  
-        <BrowserRouter>
-          <SuiWalletProvider>
-            <TooltipProvider delayDuration={0}>
-              <SidebarProvider>
-                <AppSidebar />
-                <SidebarInset>
-                  <Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="chat/:agentId" element={<Chat />} />
-                    <Route path="settings/:agentId" element={<Settings />} />
-                    <Route path="agents/new" element={<AgentCreatorRoute />} />
-                    <Route path="/create" element={<AgentCreator />} />
-                    <Route path="/logs" element={<LogViewer />} />
-                    <Route path="room/:serverId" element={<Room />} />
-                    <Route path="settings/" element={<EnvSettings />} />
-                    <Route path="/callback" element={<AuthCallback />} />
-                  </Routes>
-                </SidebarInset>
-              </SidebarProvider>
-              <Toaster />
-            </TooltipProvider>
-          </SuiWalletProvider>
-        </BrowserRouter>
-      </div>
+      <SuiClientProvider networks={networks} defaultNetwork="testnet">
+        <WalletProvider>
+          <div
+            className="dark antialiased"
+            style={{
+              colorScheme: 'dark',
+            }}
+          >  
+            <BrowserRouter>
+              <TooltipProvider delayDuration={0}>
+                <SidebarProvider>
+                  <AppSidebar />
+                  <SidebarInset>
+                    <Routes>
+                      <Route path="/" element={<Home />} />
+                      <Route path="chat/:agentId" element={<Chat />} />
+                      <Route path="settings/:agentId" element={<Settings />} />
+                      <Route path="agents/new" element={<AgentCreatorRoute />} />
+                      <Route path="/create" element={<AgentCreator />} />
+                      <Route path="/logs" element={<LogViewer />} />
+                      <Route path="room/:serverId" element={<Room />} />
+                      <Route path="settings/" element={<EnvSettings />} />
+                    </Routes>
+                  </SidebarInset>
+                </SidebarProvider>
+                <Toaster />
+              </TooltipProvider>
+            </BrowserRouter>
+          </div>
+        </WalletProvider>
+      </SuiClientProvider>
     </QueryClientProvider>
   );
 }
