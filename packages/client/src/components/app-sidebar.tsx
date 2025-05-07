@@ -93,14 +93,17 @@ export function AppSidebar() {
           {/* Wallet Section */}
           <SidebarGroup>
             <SidebarGroupContent className="px-2">
-              <div className="px-4 py-2">
-                {
-                  currentAccount ? (
-                    <p>Connected Account: {currentAccount.address}</p>
-                  ) : (
-                    <ConnectButton />
-                  )
-                }
+              <div className="w-full rounded-md bg-card p-2">
+                {currentAccount ? (
+                  <div className="text-sm">
+                    <p className="font-medium">지갑 연결됨</p>
+                    <p className="text-xs text-muted-foreground truncate">
+                      {currentAccount.address.substring(0, 10)}...{currentAccount.address.substring(currentAccount.address.length - 4)}
+                    </p>
+                  </div>
+                ) : (
+                  <ConnectButton />
+                )}
               </div>
             </SidebarGroupContent>
           </SidebarGroup>

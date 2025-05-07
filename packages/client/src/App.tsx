@@ -1,4 +1,5 @@
 import './index.css';
+import '@mysten/dapp-kit/dist/index.css';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useEffect } from 'react';
