@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router';
 import { useWallet } from '@/contexts/wallet-context';
+import { handleAuthCallback } from '@/lib/auth';
 
 const Callback: React.FC = () => {
   const { processJwt } = useWallet();
@@ -9,9 +10,7 @@ const Callback: React.FC = () => {
 
   useEffect(() => {
     const handleCallback = async () => {
-      // Extract id_token parameter from URL
-      const params = new URLSearchParams(window.location.search);
-      const idToken = params.get('id_token');
+      const idToken = handleAuthCallback(window.location.href);
       
       if (idToken) {
         try {

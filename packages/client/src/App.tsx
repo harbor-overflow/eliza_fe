@@ -20,6 +20,12 @@ import EnvSettings from './components/env-settings';
 import { SuiClientProvider, WalletProvider } from '@mysten/dapp-kit';
 import { getFullnodeUrl } from '@mysten/sui/client';
 
+const networks = {
+  devnet: { url: getFullnodeUrl('devnet') },
+  mainnet: { url: getFullnodeUrl('mainnet') },
+  testnet: { url: getFullnodeUrl('testnet') },
+};
+
 // Create a query client with optimized settings
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -61,13 +67,6 @@ const prefetchInitialData = async () => {
 
 // Execute prefetch immediately
 prefetchInitialData();
-
-// 네트워크 설정
-const networks = {
-  devnet: { url: getFullnodeUrl('devnet') },
-  mainnet: { url: getFullnodeUrl('mainnet') },
-  testnet: { url: getFullnodeUrl('testnet') },
-};
 
 function App() {
   useVersion();
