@@ -305,11 +305,24 @@ export default function Page({
     }
   };
 
-  const handleSendMessage = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSendMessage = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!input || messageProcessing) return;
 
+    setMessageProcessing(true);
     const messageId = randomUUID();
+
+    let fileData = null;
+    if (selectedFile) {
+      try {
+        fileData = await uploadFile(selectedFile);
+      } catch (error) {
+        console.error('[Chat] Error uploading file:', error);
+        alert('file upload failed');
+        setMessageProcessing(false);
+        return;
+      }
+    }
 
     // Always add the user's message immediately to the UI before sending it to the server
     const userMessage: ContentWithUser = {
@@ -347,9 +360,12 @@ export default function Page({
     );
 
     // Send the message to the server/agent
-    socketIOManager.sendMessage(input, roomId, CHAT_SOURCE);
+    if (fileData) {
+      socketIOManager.sendMessage(input + ' fileName: ' + fileData.fileName, roomId, CHAT_SOURCE);
+    } else {
+      socketIOManager.sendMessage(input, roomId, CHAT_SOURCE);
+    }
 
-    setMessageProcessing(true);
     setSelectedFile(null);
     setInput('');
     formRef.current?.reset();
@@ -361,11 +377,45 @@ export default function Page({
     }
   }, []);
 
+  const uploadFile = async (file: File) => {
+    // check file size (10MB)
+    const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+    if (file.size > MAX_FILE_SIZE) {
+      throw new Error('File size exceeds 10MB limit');
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error(`Upload failed: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('[Chat] File upload error:', error);
+      throw error;
+    }
+  };
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file?.type.startsWith('image/')) {
-      setSelectedFile(file);
+    if (!file) return;
+
+    const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+
+    if (file.size > MAX_FILE_SIZE) {
+      alert('File size exceeds 10MB limit.');
+      return;
     }
+
+    setSelectedFile(file);
   };
 
   return (
@@ -530,7 +580,6 @@ export default function Page({
                         type="file"
                         ref={fileInputRef}
                         onChange={handleFileChange}
-                        accept="image/*"
                         className="hidden"
                       />
                     </div>
