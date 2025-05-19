@@ -27,6 +27,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 import AgentAvatarStack from './agent-avatar-stack';
 import GroupPanel from './group-panel';
 import clientLogger from '../lib/logger';
+import ReactMarkdown from 'react-markdown';
 
 type ExtraContentFields = {
   name: string;
@@ -86,9 +87,41 @@ function MessageContent({
           {isUser ? (
             message.text
           ) : shouldAnimate ? (
-            <AIWriter>{message.text}</AIWriter>
+            <AIWriter>
+              <ReactMarkdown
+                components={{
+                  a: ({ node, children, ...props }) => (
+                    <a
+                      className="text-blue-500 hover:underline cursor-pointer"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      {...props}
+                    >
+                      {children}
+                    </a>
+                  ),
+                }}
+              >
+                {message.text}
+              </ReactMarkdown>
+            </AIWriter>
           ) : (
-            message.text
+            <ReactMarkdown
+              components={{
+                a: ({ node, children, ...props }) => (
+                  <a
+                    className="text-blue-500 hover:underline cursor-pointer"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    {...props}
+                  >
+                    {children}
+                  </a>
+                ),
+              }}
+            >
+              {message.text}
+            </ReactMarkdown>
           )}
         </div>
         {!message.text && message.thought && (
