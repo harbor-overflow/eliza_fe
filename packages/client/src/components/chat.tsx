@@ -440,17 +440,37 @@ export default function Page({
   const uploadFile = async (file: File) => {
     // check file size (10MB)
     const CHUNK_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-    // if (file.size > MAX_FILE_SIZE) {
-    //   throw new Error('File size exceeds 10MB limit');
-    // }
+    if (file.size > CHUNK_FILE_SIZE) {
+      const chunks = [];
+      for (let i = 0; i < file.size; i += CHUNK_FILE_SIZE) {
+        chunks.push(file.slice(i, i + CHUNK_FILE_SIZE));
+      }
 
-    const chunks = [];
-    for (let i = 0; i < file.size; i += CHUNK_FILE_SIZE) {
-      chunks.push(file.slice(i, i + CHUNK_FILE_SIZE));
+      for (let i = 0; i < chunks.length; i++) {
+        await uploadChunk(chunks[i], i, file.name);
+      }
+    } else {
+      await uploadSingleFile(file);
     }
+  };
 
-    for (let i = 0; i < chunks.length; i++) {
-      await uploadChunk(chunks[i], i, file.name);
+  const uploadSingleFile = async (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error(`Upload failed: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('[Chat] File upload error:', error);
+      throw error;
     }
   };
 
