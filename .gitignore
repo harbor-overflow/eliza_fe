@@ -151,3 +151,5 @@ playwright-report/
 temp/
 tmp/
 temp/*
+
+.vscode
