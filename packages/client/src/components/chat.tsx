@@ -410,7 +410,13 @@ export default function Page({
     }
   }, []);
 
-  const uploadChunk = async (chunk: Blob, chunkIndex: number, fileName: string) => {
+  const uploadChunk = async (
+    chunk: Blob,
+    chunkIndex: number,
+    totalChunks: number,
+    fileName: string,
+    fileId?: string
+  ) => {
     const chunkFile = new File([chunk], `${fileName}.part${chunkIndex}`, {
       type: 'application/octet-stream',
     });
@@ -418,10 +424,15 @@ export default function Page({
     const formData = new FormData();
     formData.append('file', chunkFile);
     formData.append('chunkIndex', chunkIndex.toString());
+    formData.append('totalChunks', totalChunks.toString());
     formData.append('fileName', fileName);
 
+    if (fileId) {
+      formData.append('fileId', fileId);
+    }
+
     try {
-      const response = await fetch('/api/upload', {
+      const response = await fetch('/api/upload-chunk', {
         method: 'POST',
         body: formData,
       });
@@ -438,16 +449,50 @@ export default function Page({
   };
 
   const uploadFile = async (file: File) => {
-    // check file size (10MB)
+    // chunk file size (10MB)
     const CHUNK_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+    console.log('file size:', file.size);
     if (file.size > CHUNK_FILE_SIZE) {
       const chunks = [];
+      let fileId = null;
+
       for (let i = 0; i < file.size; i += CHUNK_FILE_SIZE) {
         chunks.push(file.slice(i, i + CHUNK_FILE_SIZE));
       }
 
-      for (let i = 0; i < chunks.length; i++) {
-        await uploadChunk(chunks[i], i, file.name);
+      const totalChunks = chunks.length;
+      console.log('total chunks:', totalChunks);
+      for (let i = 0; i < totalChunks; i++) {
+        const result = await uploadChunk(chunks[i], i, totalChunks, file.name, fileId);
+
+        if (i === 0) {
+          fileId = result.fileId;
+          console.log(`Received fileId: ${fileId}`);
+        }
+
+        console.log(
+          `Uploaded chunk ${i + 1}/${totalChunks} (${Math.round(((i + 1) / totalChunks) * 100)}%)`
+        );
+      }
+
+      if (fileId) {
+        const completeResponse = await fetch('/api/complete-upload', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ fileId }),
+        });
+
+        if (!completeResponse.ok) {
+          throw new Error(
+            `File assembly failed: ${completeResponse.status} ${completeResponse.statusText}`
+          );
+        }
+
+        const finalResult = await completeResponse.json();
+        console.log('File upload complete:', finalResult);
+        return finalResult;
       }
     } else {
       await uploadSingleFile(file);
