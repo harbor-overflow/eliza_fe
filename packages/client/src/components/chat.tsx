@@ -394,7 +394,7 @@ export default function Page({
 
     // Send the message to the server/agent
     if (fileData) {
-      socketIOManager.sendMessage(input + ' fileName: ' + fileData.fileName, roomId, CHAT_SOURCE);
+      socketIOManager.sendMessage(input + ' fileId: ' + fileData.fileId, roomId, CHAT_SOURCE);
     } else {
       socketIOManager.sendMessage(input, roomId, CHAT_SOURCE);
     }
@@ -495,7 +495,7 @@ export default function Page({
         return finalResult;
       }
     } else {
-      await uploadSingleFile(file);
+      return await uploadSingleFile(file);
     }
   };
 

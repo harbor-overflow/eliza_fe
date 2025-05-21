@@ -433,7 +433,7 @@ export default function Page({ serverId }: { serverId: UUID }) {
     // Send the message to the server/agent
     if (fileData) {
       socketIOManager.sendMessage(
-        input + ' fileName: ' + fileData.fileName,
+        input + ' fileId: ' + fileData.fileId,
         serverId,
         GROUP_CHAT_SOURCE
       );
@@ -540,7 +540,7 @@ export default function Page({ serverId }: { serverId: UUID }) {
         return finalResult;
       }
     } else {
-      await uploadSingleFile(file);
+      return await uploadSingleFile(file);
     }
   };
 
