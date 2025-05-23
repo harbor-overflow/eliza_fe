@@ -80,7 +80,7 @@
   "gitHead": "917e8b28d02cc09316dd61d1fb29c683f29689ef",
   "dependencies": {
     "@electric-sql/pglite": "^0.2.17",
-    "@yhl125/plugin-harbor": "0.0.22",
+    "@yhl125/plugin-harbor": "0.0.23",
     "socket.io": "^4.8.1",
     "zod": "3.24.2"
   }
